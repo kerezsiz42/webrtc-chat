@@ -2,14 +2,39 @@
 <html lang="en">
   <meta charset="UTF-8" />
   <title>WebRTC Chat</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="webrtc.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
   <script type="module" src="script.js"></script>
-  <body>
-    <div class="">
-      <h1>This is a Heading</h1>
-      <p>This is a paragraph.</p>
-      <p>This is another paragraph.</p>
-    </div>
+  <body class="color-white">
+    <main class="container">
+      <div class="box">
+        <h1>WebRTC Chat</h1>
+        <p>This is a paragraph.</p>
+        <input type="text" class="border-white border-radius color-white" />
+        <input
+          type="button"
+          id="call-button"
+          value="Call"
+          class="border-white border-radius color-white"
+        />
+      </div>
+    </main>
+
+    <dialog id="call-dialog">
+      <div class="box border-white border-radius color-white">
+        <p>Calling user with id: asd123 alias Anonymous</p>
+        <input
+          type="button"
+          value="Answer"
+          class="border-green border-radius color-green"
+        />
+        <input
+          type="button"
+          value="Reject"
+          class="border-red border-radius color-red"
+        />
+      </div>
+    </dialog>
   </body>
 </html>

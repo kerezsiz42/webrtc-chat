@@ -3,7 +3,7 @@
 /**
  * @param {"INFO" | "ERROR" | "DEBUG" | "WARN"} level
  * @param {string} msg
- * @param {any} [data]
+ * @param {object} [data]
  */
 export function log(level, msg, data) {
   const time = new Date().toISOString();

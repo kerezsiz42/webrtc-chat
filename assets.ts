@@ -1,3 +1,12 @@
+import {
+  CONTENT_TYPE_CSS,
+  CONTENT_TYPE_HEADER,
+  CONTENT_TYPE_HTML,
+  CONTENT_TYPE_JS,
+  CONTENT_TYPE_JSON,
+  CONTENT_TYPE_PLAIN,
+  CONTENT_TYPE_SVG,
+} from "./contentType.js";
 import { log } from "./log.js";
 
 const indexHTML = await Deno.readTextFile("index.html");
@@ -6,7 +15,9 @@ const logJS = await Deno.readTextFile("log.js");
 const subscriberJS = await Deno.readTextFile("subscriber.js");
 const idJS = await Deno.readTextFile("id.js");
 const rpcJS = await Deno.readTextFile("rpc.js");
+const contentTypeJS = await Deno.readTextFile("contentType.js");
 const stylesCSS = await Deno.readTextFile("styles.css");
+const webRTCSVG = await Deno.readTextFile("webrtc.svg");
 
 export function contentByFilename(
   filename: string
@@ -24,18 +35,16 @@ export function contentByFilename(
       return [null, idJS];
     case "rpc.js":
       return [null, rpcJS];
+    case "contentType.js":
+      return [null, contentTypeJS];
     case "styles.css":
       return [null, stylesCSS];
+    case "webrtc.svg":
+      return [null, webRTCSVG];
     default:
       return [Error(`file with filename ${filename} not found`), null];
   }
 }
-
-export const CONTENT_TYPE_JSON = "application/json; charset=utf-8",
-  CONTENT_TYPE_HTML = "text/html; charset=utf-8",
-  CONTENT_TYPE_CSS = "text/css; charset=utf-8",
-  CONTENT_TYPE_JS = "text/javascript; charset=utf-8",
-  CONTENT_TYPE_PLAIN = "text/plan; charset=utf-8";
 
 export function extensionToContentType(
   extension: string
@@ -49,6 +58,8 @@ export function extensionToContentType(
       return [null, CONTENT_TYPE_HTML];
     case "json":
       return [null, CONTENT_TYPE_JSON];
+    case "svg":
+      return [null, CONTENT_TYPE_SVG];
     default:
       return [Error(`no content type found for extension ${extension}`), null];
   }
@@ -64,7 +75,7 @@ export function serveStaticAsset(r: Request): Response {
       error: err.message,
     });
     return new Response("Not found", {
-      headers: { "Content-Type": CONTENT_TYPE_PLAIN },
+      headers: { [CONTENT_TYPE_HEADER]: CONTENT_TYPE_PLAIN },
       status: 404,
     });
   }
@@ -77,13 +88,13 @@ export function serveStaticAsset(r: Request): Response {
       error: err1.message,
     });
     return new Response("Not found", {
-      headers: { "Content-Type": CONTENT_TYPE_PLAIN },
+      headers: { [CONTENT_TYPE_HEADER]: CONTENT_TYPE_PLAIN },
       status: 404,
     });
   }
 
   log("DEBUG", "Serving static asset", { filename, contentType });
   return new Response(content, {
-    headers: { "Content-Type": contentType },
+    headers: { [CONTENT_TYPE_HEADER]: contentType },
   });
 }

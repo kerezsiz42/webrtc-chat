@@ -1,19 +1,20 @@
+import { serveStaticAsset } from "./assets.ts";
 import {
+  CONTENT_TYPE_HEADER,
   CONTENT_TYPE_JSON,
   CONTENT_TYPE_PLAIN,
-  serveStaticAsset,
-} from "./assets.ts";
+} from "./contentType.js";
 import { log } from "./log.js";
+import { parsePublishData } from "./parsers.ts";
 import { Relay } from "./relay.ts";
 
 function handleGetRequest(r: Request): Response {
   if (r.headers.get("upgrade") === "websocket") {
-    const url = new URL(r.url);
-    const id = url.pathname.split("/").at(-1);
+    const id = r.url.split("/").at(-1);
     if (!id) {
-      return new Response("Unauthorized", {
+      return new Response("you must provide an id in url path", {
         headers: {
-          "Content-Type": CONTENT_TYPE_PLAIN,
+          [CONTENT_TYPE_HEADER]: CONTENT_TYPE_PLAIN,
         },
         status: 401,
       });
@@ -45,14 +46,27 @@ function respond(data: any): Response {
   const json = JSON.stringify(data);
   return new Response(json, {
     headers: {
-      "Content-Type": CONTENT_TYPE_JSON,
+      [CONTENT_TYPE_HEADER]: CONTENT_TYPE_JSON,
     },
   });
 }
 
 async function handlePublish(r: Request) {
   const data = await r.json();
-  return respond(data);
+
+  const [err, publishData] = parsePublishData(data);
+  if (err !== null) {
+    return new Response(`error while parsing PublishData: ${err.message}`, {
+      headers: {
+        [CONTENT_TYPE_HEADER]: CONTENT_TYPE_PLAIN,
+      },
+      status: 400,
+    });
+  }
+
+  relay.send(publishData);
+
+  return respond("ok");
 }
 
 function handleRequest(r: Request) {
@@ -60,14 +74,14 @@ function handleRequest(r: Request) {
     return handleGetRequest(r);
   }
 
-  const url = new URL(r.url);
-  if (url.pathname.endsWith("publish")) {
+  const operation = r.url.split("/").at(-1) || "undefined";
+  if (operation === "publish") {
     return handlePublish(r);
   }
 
-  return new Response("Bad Request: no such operation", {
+  return new Response(`no such operation: ${operation}`, {
     headers: {
-      "Content-Type": CONTENT_TYPE_PLAIN,
+      [CONTENT_TYPE_HEADER]: CONTENT_TYPE_PLAIN,
     },
     status: 400,
   });
@@ -85,8 +99,9 @@ function shutdown() {
   ac.abort();
 }
 
+log("INFO", "Process started", { pid: Deno.pid });
 const ac = new AbortController();
-const relay = Relay.getInstance(ac.signal);
-Deno.serve({ onListen, signal: ac.signal }, handleRequest);
+const relay = new Relay(ac.signal);
 Deno.addSignalListener("SIGTERM", shutdown);
 Deno.addSignalListener("SIGINT", shutdown);
+Deno.serve({ onListen, signal: ac.signal }, handleRequest);

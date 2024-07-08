@@ -1,6 +1,71 @@
 body {
-    background-color: black;
-    color: white;
-    margin: 0;
-    font-family: monospace;
+  line-height: 1.15;
+  margin: 0;
+  font-family: monospace;
+  font-size: 16px;
+  display: flex;
+}
+
+input {
+  outline: none;
+  padding: 0.5em;
+  font-size: 100%;
+  margin: 0.25em 0em;
+}
+
+dialog {
+  border: 0;
+  background-color: transparent;
+}
+
+dialog::backdrop {
+  background: rgba(0, 166, 255, 0.647);
+}
+
+:root {
+  --red: rgba(196, 18, 18, 0.717);
+  --green: rgba(0, 255, 72, 0.958);
+}
+
+.color-white {
+  background-color: black;
+  color: white;
+}
+
+.color-red {
+  background-color: black;
+  color: var(--red);
+}
+
+.color-green {
+  background-color: black;
+  color: var(--green);
+}
+
+.border-radius {
+  border-radius: 3px;
+}
+
+.border-white {
+  border: 1px solid white;
+}
+
+.border-red {
+  border: 1px solid var(--red);
+}
+
+.border-green {
+  border: 1px solid var(--green);
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  max-width: 700px;
+  flex-direction: column;
+  margin: auto;
+}
+
+.box {
+  padding: 1em;
 }

@@ -4,7 +4,6 @@ export type RelayMessage = {
 };
 
 export class Relay {
-  static #instance?: Relay = undefined;
   #socketToId = new Map<WebSocket, string>();
   #idToSockets = new Map<string, WebSocket[]>();
   #broadcastChannel = new BroadcastChannel("relay");
@@ -21,10 +20,6 @@ export class Relay {
     this.#broadcastChannel.onmessage = (ev: MessageEvent<RelayMessage>) => {
       this.#sendToSocketsInternally(ev.data);
     };
-  }
-
-  static getInstance(signal?: AbortSignal) {
-    return (Relay.#instance ??= new Relay(signal));
   }
 
   add(id: string, socket: WebSocket) {
